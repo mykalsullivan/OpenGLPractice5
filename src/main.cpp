@@ -35,20 +35,25 @@ static const char* vertexShader =
         "layout (location = 0) in vec3 pos;\n"                  /* Note: 'pos' is a built-in variable in OpenGL */
         "uniform mat4 model;\n"
         "\n"
+        "out vec4 vertexColor;\n"
+        "\n"
         "void main()\n"
         "{\n"
         "   gl_Position = model * vec4(pos.x, pos.y, pos.z, 1.0);\n"    /* Note: 'gl_Position' is also built-in */
+        "   vertexColor = vec4(clamp(pos, 0.0f, 1.0f), 1.0f);\n"        /* Note: 'clamp()' keeps values in a specified range */
         "}\n";
 
 // Fragment shader
 static const char* fragmentShader =
         "#version 330\n"
         "\n"
+        "in vec4 vertexColor;\n"
+        "\n"
         "out vec4 color;\n"                                     /* Note: color is built-in */
         "\n"
         "void main()\n"
         "{\n"
-        "   color = vec4(1.0, 1.0, 1.0, 1.0);\n"
+        "   color = vertexColor;\n"
         "}\n";
 
 void createTriangle()
@@ -181,7 +186,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
 
     // Create main window
-    GLFWwindow* mainWindow = glfwCreateWindow(WIDTH, HEIGHT, "Transform Test", nullptr, nullptr);
+    GLFWwindow* mainWindow = glfwCreateWindow(WIDTH, HEIGHT, "Interpolation Test", nullptr, nullptr);
 
     // Return if the main GLFW window cannot be created
     if (mainWindow == nullptr)
@@ -266,8 +271,8 @@ int main()
 
             glUseProgram(shader);
 
-            model = glm::rotate(model, currentAngle * (float) M_PI/180, glm::vec3(0.0f, 0.0f, 1.0f));
-            model = glm::translate(model, glm::vec3(triOffset, triOffset, 0.0f));
+            model = glm::rotate(model, currentAngle * (float) M_PI/180, glm::vec3(1.0f, 1.0f, 0.5f));
+            //model = glm::translate(model, glm::vec3(triOffset, triOffset, 0.0f));
             model = glm::scale(model, glm::vec3(0.5f, 0.5f, 1.0f));
 
             glUniform1f((int) uniformModel, triOffset);
